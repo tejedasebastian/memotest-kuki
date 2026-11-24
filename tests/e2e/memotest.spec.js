@@ -1,7 +1,7 @@
 const { test, expect } = require('@playwright/test');
 
 async function empezarJuego(page) {
-    await page.goto('/');
+    await page.goto('./');
     await page.getByRole('button', { name: 'Empezar' }).click();
     await expect(page.locator('#estado')).toHaveAttribute('data-state', 'playing');
     await expect(page.locator('.pokemon')).toHaveCount(16);
@@ -43,7 +43,7 @@ test('crea 16 cartas, 8 parejas y carga los recursos sin node_modules', async ({
         }
     });
 
-    await page.goto('/');
+    await page.goto('./');
 
     await expect(page.locator('.carta')).toHaveCount(16);
     await expect(page.getByRole('button', { name: 'Empezar' })).toBeVisible();

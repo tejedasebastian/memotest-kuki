@@ -1,6 +1,6 @@
 const { defineConfig, devices } = require('@playwright/test');
 
-const baseURL = process.env.BASE_URL || 'http://127.0.0.1:4183';
+const baseURL = (process.env.BASE_URL || 'http://127.0.0.1:4183').replace(/\/+$/, '') + '/';
 const isRemoteRun = Boolean(process.env.BASE_URL);
 
 module.exports = defineConfig({
