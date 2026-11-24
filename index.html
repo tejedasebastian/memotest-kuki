@@ -1,151 +1,124 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <meta charset='utf-8'>
-        <meta http-equiv='X-UA-Compatible' content='IE=edge'>
-        <title>Memotest</title>
-        <meta name='viewport' content='width=device-width, initial-scale=1'>
-        <link rel="icon" type="image/x-icon" href="icono.png">
-        <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
-        <link rel="stylesheet" href="node_modules/bootstrap-icons\font\bootstrap-icons.min.css">
-        <link rel='stylesheet' type='text/css' media='screen' href='main.css'>
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Anta&family=Fjalla+One&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Protest+Revolution&family=Protest+Riot&family=Protest+Strike&display=swap" rel="stylesheet">
-    </head>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Memotest: encuentra las 8 parejas de Pokémon en un tablero de 16 cartas.">
+    <meta name="theme-color" content="#025959">
+    <title>Memotest</title>
+    <link rel="icon" type="image/png" href="icono.png">
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+        crossorigin="anonymous">
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+        rel="stylesheet"
+        integrity="sha384-XGjxtQfXaH2tnPFa9x+ruJTuLE3Aa6LhHSWRr1XeTyhezb4abCG4ccI5AkVDxqC+"
+        crossorigin="anonymous">
+    <link rel="stylesheet" href="main.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Anta&family=Fjalla+One&family=Protest+Revolution&family=Protest+Riot&display=swap"
+        rel="stylesheet">
+</head>
 <body>
-    <section>
-        <div class="container">
-            <div class="row">
-                <p class="bienvenida h1">!Bienvenido al Memotest!</p>
-            </div>
-            <div class="row">
-                <div class="col-md-6 col-12">
-                    <div id="estado" class="alerta-estado alert alert-primary" role="alert">
-                        Toca 'Empezar' para jugar
-                      </div>
+    <main>
+        <header class="cabecera container">
+            <h1 class="bienvenida">¡Bienvenido al Memotest!</h1>
+            <div class="panel-juego row g-2 align-items-stretch">
+                <div class="col-12 col-lg-6">
+                    <div id="estado" class="alerta-estado alert alert-primary mb-0" role="status"
+                        aria-live="polite" data-state="idle">
+                        Toca «Empezar» para jugar
+                    </div>
                 </div>
-                <div class= "col-md-2 col-4">
+                <div class="col-4 col-lg-2 d-grid">
                     <button type="button" class="boton-empezar btn btn-primary">Empezar</button>
                 </div>
-                <div class="col-md-2 col-4">
-                    <p class="tiempo">Tiempo: <span id="tiempo">-</span> s</p>
+                <div class="col-4 col-lg-2">
+                    <p class="dato">Tiempo: <span id="tiempo">-</span> s</p>
                 </div>
-                <div class="col-md-2 col-4">
-                    <p class="tiempo">Intento: <span id="intento">-</span> </p>
-                </div>
-            </div>
-        </div>
-    </section>
-    <section>
-        <div class="todas-cartas container">
-            <div class="row">
-                <div class="carta col-3">
-                    <i class="icon-pregunta bi bi-question-square-fill"></i>
-                    <div class="pokemon-espacio">
-
-                    </div>
-                </div>
-                <div class="carta col-3">
-                    <i class="icon-pregunta bi bi-question-square-fill"></i>
-                    <div class="pokemon-espacio">
-
-                    </div>
-                </div>
-                <div class="carta col-3">
-                    <i class="icon-pregunta bi bi-question-square-fill"></i>
-                    <div class="pokemon-espacio">
-
-                    </div>
-                </div>
-                <div class="carta col-3">
-                    <i class="icon-pregunta bi bi-question-square-fill"></i>
-                    <div class="pokemon-espacio">
-
-                    </div>
+                <div class="col-4 col-lg-2">
+                    <p class="dato">Intentos: <span id="intento">-</span></p>
                 </div>
             </div>
-            <div class="row">
-                <div class="carta col-3">
-                    <i class="icon-pregunta bi bi-question-square-fill"></i>
-                    <div class="pokemon-espacio">
+        </header>
 
-                    </div>
-                </div>
-                <div class="carta col-3">
-                    <i class="icon-pregunta bi bi-question-square-fill"></i>
-                    <div class="pokemon-espacio">
-
-                    </div>
-                </div>
-                <div class="carta col-3">
-                    <i class="icon-pregunta bi bi-question-square-fill"></i>
-                    <div class="pokemon-espacio">
-
-                    </div>
-                </div>
-                <div class="carta col-3">
-                    <i class="icon-pregunta bi bi-question-square-fill"></i>
-                    <div class="pokemon-espacio">
-
-                    </div>
-                </div>
+        <section class="todas-cartas container" aria-label="Tablero de memorama">
+            <div class="tablero">
+                <button type="button" class="carta" aria-label="Carta oculta 1">
+                    <i class="icon-pregunta bi bi-question-square-fill" aria-hidden="true"></i>
+                    <span class="pokemon-espacio"></span>
+                </button>
+                <button type="button" class="carta" aria-label="Carta oculta 2">
+                    <i class="icon-pregunta bi bi-question-square-fill" aria-hidden="true"></i>
+                    <span class="pokemon-espacio"></span>
+                </button>
+                <button type="button" class="carta" aria-label="Carta oculta 3">
+                    <i class="icon-pregunta bi bi-question-square-fill" aria-hidden="true"></i>
+                    <span class="pokemon-espacio"></span>
+                </button>
+                <button type="button" class="carta" aria-label="Carta oculta 4">
+                    <i class="icon-pregunta bi bi-question-square-fill" aria-hidden="true"></i>
+                    <span class="pokemon-espacio"></span>
+                </button>
+                <button type="button" class="carta" aria-label="Carta oculta 5">
+                    <i class="icon-pregunta bi bi-question-square-fill" aria-hidden="true"></i>
+                    <span class="pokemon-espacio"></span>
+                </button>
+                <button type="button" class="carta" aria-label="Carta oculta 6">
+                    <i class="icon-pregunta bi bi-question-square-fill" aria-hidden="true"></i>
+                    <span class="pokemon-espacio"></span>
+                </button>
+                <button type="button" class="carta" aria-label="Carta oculta 7">
+                    <i class="icon-pregunta bi bi-question-square-fill" aria-hidden="true"></i>
+                    <span class="pokemon-espacio"></span>
+                </button>
+                <button type="button" class="carta" aria-label="Carta oculta 8">
+                    <i class="icon-pregunta bi bi-question-square-fill" aria-hidden="true"></i>
+                    <span class="pokemon-espacio"></span>
+                </button>
+                <button type="button" class="carta" aria-label="Carta oculta 9">
+                    <i class="icon-pregunta bi bi-question-square-fill" aria-hidden="true"></i>
+                    <span class="pokemon-espacio"></span>
+                </button>
+                <button type="button" class="carta" aria-label="Carta oculta 10">
+                    <i class="icon-pregunta bi bi-question-square-fill" aria-hidden="true"></i>
+                    <span class="pokemon-espacio"></span>
+                </button>
+                <button type="button" class="carta" aria-label="Carta oculta 11">
+                    <i class="icon-pregunta bi bi-question-square-fill" aria-hidden="true"></i>
+                    <span class="pokemon-espacio"></span>
+                </button>
+                <button type="button" class="carta" aria-label="Carta oculta 12">
+                    <i class="icon-pregunta bi bi-question-square-fill" aria-hidden="true"></i>
+                    <span class="pokemon-espacio"></span>
+                </button>
+                <button type="button" class="carta" aria-label="Carta oculta 13">
+                    <i class="icon-pregunta bi bi-question-square-fill" aria-hidden="true"></i>
+                    <span class="pokemon-espacio"></span>
+                </button>
+                <button type="button" class="carta" aria-label="Carta oculta 14">
+                    <i class="icon-pregunta bi bi-question-square-fill" aria-hidden="true"></i>
+                    <span class="pokemon-espacio"></span>
+                </button>
+                <button type="button" class="carta" aria-label="Carta oculta 15">
+                    <i class="icon-pregunta bi bi-question-square-fill" aria-hidden="true"></i>
+                    <span class="pokemon-espacio"></span>
+                </button>
+                <button type="button" class="carta" aria-label="Carta oculta 16">
+                    <i class="icon-pregunta bi bi-question-square-fill" aria-hidden="true"></i>
+                    <span class="pokemon-espacio"></span>
+                </button>
             </div>
-            <div class="row">
-                <div class="carta col-3">
-                    <i class="icon-pregunta bi bi-question-square-fill"></i>
-                    <div class="pokemon-espacio">
+        </section>
+    </main>
 
-                    </div>
-                </div>
-                <div class="carta col-3">
-                    <i class="icon-pregunta bi bi-question-square-fill"></i>       
-                    <div class="pokemon-espacio">
-
-                    </div>         
-                </div>
-                <div class="carta col-3">
-                    <i class="icon-pregunta bi bi-question-square-fill"></i>
-                    <div class="pokemon-espacio">
-
-                    </div>
-                </div>
-                <div class="carta col-3">
-                    <i class="icon-pregunta bi bi-question-square-fill"></i>
-                    <div class="pokemon-espacio">
-
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="carta col-3">
-                    <i class="icon-pregunta bi bi-question-square-fill"></i>
-                    <div class="pokemon-espacio">
-
-                    </div>
-                </div>
-                <div class="carta col-3">
-                    <i class="icon-pregunta bi bi-question-square-fill"></i>
-                    <div class="pokemon-espacio">
-
-                    </div>
-                </div>
-                <div class="carta col-3">
-                    <i class="icon-pregunta bi bi-question-square-fill"></i>
-                    <div class="pokemon-espacio">
-
-                    </div>
-                </div>
-                <div class="carta col-3">
-                    <i class="icon-pregunta bi bi-question-square-fill"></i>
-                    <div class="pokemon-espacio">
-
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-   <script src='main.js'></script>  
+    <script src="main.js"></script>
 </body>
 </html>

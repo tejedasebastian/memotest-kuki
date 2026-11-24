@@ -1,153 +1,219 @@
-let tiempo = 0;
-let intervaloTiempo;
+(() => {
+    'use strict';
 
-document.querySelector('button[type=button]').onclick = comenzarJuego;
+    const TOTAL_PAREJAS = 8;
+    const NOMBRES_POKEMON = [
+        'pokemon1',
+        'pokemon2',
+        'pokemon3',
+        'pokemon4',
+        'pokemon5',
+        'pokemon6',
+        'pokemon7',
+        'pokemon8',
+    ];
+    const TIEMPO_DE_VOLTEO_MS = 850;
 
-function comenzarJuego() {
-    reiniciarEstado()
-    intervaloTiempo = setInterval(actualizarTiempo, 1000);
-    actualizarEstado('Desvela las casillas para encontrar parejas')
-    randomizarPosicionPokemon()
-}
-function reiniciarEstado(){
-    const $pokemones = document.querySelectorAll('.pokemon-espacio')
-    $pokemones.forEach(pokemon => {
-        pokemon.innerHTML = ''; 
-    });
-    const $iconos = document.querySelectorAll('.icon-pregunta')
-    $iconos.forEach(icono =>{
-        icono.classList.remove('oculto')
-    })
-    const $intento =  document.querySelector('#intento')
-    $intento.textContent = '-'
-    const tiempoInicial = document.querySelector('#tiempo');
-    tiempoInicial.textContent = '-'
-     pokemonSeleccionados = [];
-     elementosPokemons =[];
-     cartaSeleccionadas = [];
-     pareja=0;
-     tiempo = 0;
-     intento= 0;
-     listaNumeros = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
-}
+    const estado = {
+        jugando: false,
+        bloqueado: false,
+        primeraCarta: null,
+        parejasEncontradas: 0,
+        intentos: 0,
+        segundos: 0,
+        intervaloTiempo: null,
+        timeoutVolteo: null,
+    };
 
-function actualizarTiempo() {
-    const tiempoInicial = document.querySelector('#tiempo');
-    tiempo++;
+    const cartas = Array.from(document.querySelectorAll('.carta'));
+    const tablero = document.querySelector('.tablero');
+    const botonEmpezar = document.querySelector('.boton-empezar');
+    const elementoEstado = document.querySelector('#estado');
+    const elementoTiempo = document.querySelector('#tiempo');
+    const elementoIntento = document.querySelector('#intento');
 
-    tiempoInicial.textContent = tiempo;
-}
-
-
-let listaNumeros = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
-
-function obtenerNumeroAleatorio() {
-    let indice = Math.floor(Math.random() * listaNumeros.length);
-    let numeroAleatorio = listaNumeros[indice];
-    listaNumeros.splice(indice, 1);
-    return numeroAleatorio;
-}
-function randomizarPosicionPokemon(){
-    const espacio = document.querySelectorAll('.pokemon-espacio')
-    espacio.forEach(
-        function(espacioPokemon){
-            let numero = obtenerNumeroAleatorio();
-            let img = document.createElement('img')
-            img.src = 'imagenes/' + numero + '.png';
-            if(numero===0 || numero === 8){
-                img.setAttribute('name', 'pokemon1');
-            }else if(numero===1 || numero === 9){
-                img.setAttribute('name', 'pokemon2');
-            }else if(numero===2 || numero === 10){
-                img.setAttribute('name', 'pokemon3');
-            }else if(numero===3 || numero === 11){
-                img.setAttribute('name', 'pokemon4');
-            }else if(numero===4 || numero === 12){
-                img.setAttribute('name', 'pokemon5');
-            }else if(numero===5 || numero === 13){
-                img.setAttribute('name', 'pokemon6');
-            }else if(numero===6 || numero === 14){
-                img.setAttribute('name', 'pokemon7');
-            }else if(numero===7 || numero === 15){
-                img.setAttribute('name', 'pokemon8');
-            }
-            img.classList.add('pokemon')
-            img.classList.add('oculto')
-            espacioPokemon.appendChild(img)
-        }
-    );
-}
-
-
-const iconosPregunta = document.querySelectorAll('.icon-pregunta');
-
-iconosPregunta.forEach(function(icono){
-    icono.addEventListener('click', function() {
-        mostrarPokemon(icono);
-    });
-});
-let intento =0;
-let pokemonSeleccionados = [];
-let elementosPokemons =[];
-let cartaSeleccionadas = [];
-let pareja=0
-function mostrarPokemon($pokemon) {
-
-    cartaSeleccionadas.push($pokemon)
-    $pokemon.classList.add('oculto');
-    const carta = $pokemon.closest('.carta');
-    const imagenPokemon = carta.querySelector('.pokemon');
-    elementosPokemons.push(imagenPokemon)
-    imagenPokemon.classList.remove('oculto');
-    const namePokemon = imagenPokemon.getAttribute('name')
-    if(pokemonSeleccionados.length<1){
-        pokemonSeleccionados.push(namePokemon)
-    }else{
-        if(namePokemon != pokemonSeleccionados[0]){
-            setTimeout(function(){
-                cartaSeleccionadas[0].classList.remove('oculto')
-                elementosPokemons[0].classList.add('oculto');
-                $pokemon.classList.remove('oculto');
-                imagenPokemon.classList.add('oculto');
-                cartaSeleccionadas = [];
-                elementosPokemons = [];
-            },1000)
-            pokemonSeleccionados = [];
-
-        }else{
-            cartaSeleccionadas = [];
-            elementosPokemons = []; 
-            pokemonSeleccionados = [];
-            pareja++
-        }
-        intento++;
-          contadorIntento()
+    function mostrarEstado(texto, nombreEstado) {
+        elementoEstado.textContent = texto;
+        elementoEstado.dataset.state = nombreEstado;
+        elementoEstado.classList.remove('alert-primary', 'alert-success', 'alert-danger');
+        elementoEstado.classList.add(nombreEstado === 'won' ? 'alert-success' : 'alert-primary');
     }
-    ganar();
-}
-function ganar(){
-    if(pareja >= 8){
-        actualizarEstado('Ganaste! Aprieta empezar para volver a jugar',true)
+
+    function detenerIntervalo() {
+        if (estado.intervaloTiempo !== null) {
+            clearInterval(estado.intervaloTiempo);
+            estado.intervaloTiempo = null;
+        }
+    }
+
+    function iniciarIntervalo() {
         detenerIntervalo();
+        estado.intervaloTiempo = setInterval(() => {
+            estado.segundos += 1;
+            elementoTiempo.textContent = String(estado.segundos);
+        }, 1000);
     }
 
-}
-function contadorIntento(){
-   const $intento =  document.querySelector('#intento')
-   $intento.textContent = intento
-}
-function actualizarEstado(estado,error=false){
-    const $estado = document.querySelector('#estado')
-    $estado.textContent = estado
-    if(error){
-        $estado.classList.remove('alert-primary');
-        $estado.classList.add('alert-danger');
-    }else{
-        $estado.classList.remove('alert-danger');
-        $estado.classList.add('alert-primary');
+    function cancelarVolteoPendiente() {
+        if (estado.timeoutVolteo !== null) {
+            clearTimeout(estado.timeoutVolteo);
+            estado.timeoutVolteo = null;
+        }
     }
-}
 
-function detenerIntervalo() {
-    clearInterval(intervaloTiempo);
-}
+    function desbloquearTablero() {
+        estado.bloqueado = false;
+        tablero.classList.remove('bloqueado');
+        tablero.setAttribute('aria-busy', 'false');
+    }
+
+    function limpiarTablero() {
+        cancelarVolteoPendiente();
+        desbloquearTablero();
+        estado.jugando = false;
+        estado.primeraCarta = null;
+        estado.parejasEncontradas = 0;
+        estado.intentos = 0;
+        estado.segundos = 0;
+
+        cartas.forEach((carta, indice) => {
+            const icono = carta.querySelector('.icon-pregunta');
+            const espacio = carta.querySelector('.pokemon-espacio');
+            icono.classList.remove('oculto');
+            espacio.innerHTML = '';
+            carta.classList.remove('emparejada', 'revelada');
+            carta.disabled = false;
+            carta.dataset.numero = String(indice + 1);
+            carta.setAttribute('aria-label', `Carta oculta ${indice + 1}`);
+        });
+
+        elementoTiempo.textContent = '0';
+        elementoIntento.textContent = '0';
+    }
+
+    function crearImagenPokemon(numero) {
+        const imagen = document.createElement('img');
+        imagen.src = `imagenes/${numero}.webp`;
+        imagen.alt = '';
+        imagen.draggable = false;
+        imagen.classList.add('pokemon', 'oculto');
+        imagen.setAttribute('name', NOMBRES_POKEMON[numero % TOTAL_PAREJAS]);
+        return imagen;
+    }
+
+    function barajarNumeros() {
+        const numeros = Array.from({ length: cartas.length }, (_, indice) => indice);
+        for (let i = numeros.length - 1; i > 0; i -= 1) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [numeros[i], numeros[j]] = [numeros[j], numeros[i]];
+        }
+        return numeros;
+    }
+
+    function repartirCartas() {
+        const numeros = barajarNumeros();
+        cartas.forEach((carta, indice) => {
+            const imagen = crearImagenPokemon(numeros[indice]);
+            carta.querySelector('.pokemon-espacio').appendChild(imagen);
+        });
+    }
+
+    function mostrarCarta(carta) {
+        const icono = carta.querySelector('.icon-pregunta');
+        const imagen = carta.querySelector('.pokemon');
+        icono.classList.add('oculto');
+        imagen.classList.remove('oculto');
+        carta.classList.add('revelada');
+        carta.setAttribute('aria-label', 'Carta descubierta');
+    }
+
+    function ocultarCarta(carta) {
+        const icono = carta.querySelector('.icon-pregunta');
+        const imagen = carta.querySelector('.pokemon');
+        icono.classList.remove('oculto');
+        imagen.classList.add('oculto');
+        carta.classList.remove('revelada');
+        carta.setAttribute('aria-label', `Carta oculta ${carta.dataset.numero}`);
+    }
+
+    function marcarPareja(carta) {
+        carta.classList.add('emparejada');
+        carta.disabled = true;
+        carta.setAttribute('aria-label', 'Pareja encontrada');
+    }
+
+    function actualizarIntentos() {
+        elementoIntento.textContent = String(estado.intentos);
+    }
+
+    function ganar() {
+        estado.jugando = false;
+        detenerIntervalo();
+        const resumen = `¡Ganaste! Completaste las 8 parejas en ${estado.intentos} intentos y ${estado.segundos} s. Pulsa «Empezar» para volver a jugar.`;
+        mostrarEstado(resumen, 'won');
+    }
+
+    function resolverPareja(primeraCarta, segundaCarta) {
+        const nombrePrimera = primeraCarta.querySelector('.pokemon').getAttribute('name');
+        const nombreSegunda = segundaCarta.querySelector('.pokemon').getAttribute('name');
+
+        estado.intentos += 1;
+        actualizarIntentos();
+
+        if (nombrePrimera === nombreSegunda) {
+            marcarPareja(primeraCarta);
+            marcarPareja(segundaCarta);
+            estado.parejasEncontradas += 1;
+            desbloquearTablero();
+
+            if (estado.parejasEncontradas === TOTAL_PAREJAS) {
+                ganar();
+            }
+            return;
+        }
+
+        estado.timeoutVolteo = setTimeout(() => {
+            ocultarCarta(primeraCarta);
+            ocultarCarta(segundaCarta);
+            estado.timeoutVolteo = null;
+            desbloquearTablero();
+        }, TIEMPO_DE_VOLTEO_MS);
+    }
+
+    function manejarClicCarta(carta) {
+        if (!estado.jugando || estado.bloqueado) {
+            return;
+        }
+        if (carta.classList.contains('emparejada') || carta === estado.primeraCarta) {
+            return;
+        }
+
+        mostrarCarta(carta);
+
+        if (estado.primeraCarta === null) {
+            estado.primeraCarta = carta;
+            return;
+        }
+
+        const primeraCarta = estado.primeraCarta;
+        estado.primeraCarta = null;
+        estado.bloqueado = true;
+        tablero.classList.add('bloqueado');
+        tablero.setAttribute('aria-busy', 'true');
+        resolverPareja(primeraCarta, carta);
+    }
+
+    function comenzarJuego() {
+        limpiarTablero();
+        detenerIntervalo();
+        repartirCartas();
+        mostrarEstado('Desvela las casillas para encontrar parejas', 'playing');
+        estado.jugando = true;
+        iniciarIntervalo();
+    }
+
+    botonEmpezar.addEventListener('click', comenzarJuego);
+    cartas.forEach((carta) => {
+        carta.addEventListener('click', () => manejarClicCarta(carta));
+    });
+})();
