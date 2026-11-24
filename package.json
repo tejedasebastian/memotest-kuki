@@ -1,21 +1,27 @@
 {
-  "name": "memotest-kuki",
-  "version": "1.0.0",
-  "description": "Programa enfocado en la memoria",
-  "main": "main.js",
+  "name": "memotest",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Juego de memoria con 16 cartas y 8 parejas de Pokémon",
+  "main": "server.js",
   "scripts": {
-    "empezar": "http-server",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "cypress-dev": "cypress open",
-    "cypress-run":"cypress run"
+    "start": "node server.js",
+    "test": "playwright test",
+    "test:e2e": "playwright test"
   },
+  "keywords": [
+    "memotest",
+    "memorama",
+    "juego",
+    "playwright",
+    "github-pages"
+  ],
   "author": "Sebastian Tejeda",
-  "license": "ISC",
-  "dependencies": {
-    "bootstrap": "^5.3.2",
-    "bootstrap-icons": "^1.11.3"
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
   },
   "devDependencies": {
-    "cypress": "^13.6.5"
+    "@playwright/test": "^1.65.1"
   }
 }
